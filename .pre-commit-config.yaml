@@ -1,0 +1,108 @@
+# Dexter Pre-commit Configuration
+# Phase 1: Basic and Non-destructive Checks
+# Phase 2: Type Checking (inspired by Facebook pyrefly-pre-commit)
+# Phase 3: Static Analysis and Formatting (Ruff)
+#
+# This configuration implements a progressive approach:
+# Phase 1: Basic file hygiene, configuration validation, debug detection
+# Phase 2: Pyrefly type checking with project-level analysis
+# Phase 3: Ruff static analysis and code formatting
+# Phase 4: Smart Test Selection using pytest-testmon
+#
+# Future phases will add security scanning and custom checks
+
+repos:
+  # Basic file hygiene checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+
+      # Ensure files end with a newline
+      - id: end-of-file-fixer
+
+      # Check for files that would conflict on case-insensitive filesystems
+      - id: check-case-conflict
+
+      # Check for merge conflict markers
+      - id: check-merge-conflict
+
+      # Prevent addition of large files
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+      # Check YAML file syntax
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+
+      # Check TOML file syntax
+      - id: check-toml
+
+      # Check JSON file syntax
+      - id: check-json
+
+      # Detect debug statements (pdb, ipdb, etc.)
+      - id: debug-statements
+
+      # Check for private key files
+      - id: detect-private-key
+
+  # Python-specific checks
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      # Check for common Python anti-patterns
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      - id: python-no-log-warn
+      - id: python-use-type-annotations
+
+  # Phase 2: Type checking using Facebook pyrefly-pre-commit
+  - repo: local
+    hooks:
+      - id: pyrefly-typecheck
+        name: Pyrefly (type checking)
+        description: "Run `uv run pyrefly check`"
+        entry: uv run pyrefly check
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false # Recommended to do full repo checks. However, you can change this to `true` to only check changed files
+        require_serial: true
+        stages: [pre-commit, pre-merge-commit, pre-push, manual]
+
+  # Phase 3: Static analysis and formatting using Ruff
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff-check
+        entry: uv run ruff check --fix
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+
+      - id: ruff-format
+        name: ruff-format
+        entry: uv run ruff format
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+
+  # Phase 4: Smart Test Selection using pytest-testmon
+  - repo: local
+    hooks:
+      - id: pytest-testmon
+        name: Smart Test Selection (testmon)
+        entry: uv run pytest --testmon --tb=short tests/unit/
+        language: system
+        pass_filenames: false
+        types: [python]
+        stages: [pre-commit]
+        # Note: First run will build coverage database and may take longer
+
+# Configuration for pre-commit itself
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+fail_fast: false
+minimum_pre_commit_version: "3.0.0"
