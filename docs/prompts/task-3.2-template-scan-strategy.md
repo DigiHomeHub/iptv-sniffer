@@ -4,11 +4,12 @@
 
 **Phase**: 3 - Network Scanning  
 **Duration**: 3-4 hours  
-**Complexity**: Medium  
+**Complexity**: Medium
 
 **Goal**: Implement URL template scanning with IP range generation and private network validation.
 
 **Success Criteria**:
+
 - [ ] All tests pass
 - [ ] Type checking passes (mypy --strict)
 - [ ] Test coverage ≥ 90%
@@ -19,6 +20,7 @@
 ## Design Context
 
 **HTTP Probing Strategy** (Design.md Section 3, lines 321-368):
+
 - User provides URL template: `http://192.168.2.2:7788/rtp/{ip}:8000`
 - System generates URLs by replacing `{ip}` placeholder
 - Security: Only RFC1918 private networks allowed (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
