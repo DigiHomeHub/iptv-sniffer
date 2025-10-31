@@ -16,8 +16,8 @@ Each phase follows strict TDD principles with test coverage >80% and all modules
 
 **Total Duration:** 17 weeks  
 **Methodology:** Test-Driven Development (TDD)  
-**Test Framework:** pytest + pytest-testmon + pytest-asyncio  
-**Quality Gates:** mypy --strict, ruff check, 80%+ coverage
+**Test Framework:** unittest + pytest-testmon  
+**Quality Gates:** pyrefly check, ruff check, 80%+ coverage
 
 ---
 
@@ -2465,7 +2465,7 @@ This development plan provides a comprehensive TDD-driven roadmap covering:
 - **9 Phases** over 17 weeks
 - **60+ Test-First Tasks** with explicit Red-Green-Refactor cycles
 - **Clear Definition of Done** for each task with measurable criteria
-- **Quality Gates:** mypy --strict, ruff check, >80% test coverage, <500 lines per module
+- **Quality Gates:** pyrefly check, ruff check, >80% test coverage, <500 lines per module
 
 Each task follows strict TDD discipline:
 
