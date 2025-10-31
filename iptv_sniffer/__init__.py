@@ -1,3 +1,3 @@
 """Core package for iptv-sniffer."""
 
-__all__ = ["channel"]
+__all__ = ["channel", "utils"]
