@@ -275,10 +275,10 @@ def export(
 uv run pytest tests/unit/cli/test_app.py -v
 
 # Type checking
-mypy --strict iptv_sniffer/cli/app.py
+uv run pyrefly check iptv_sniffer/cli/app.py
 
 # Linting
-ruff check iptv_sniffer/cli/
+uv run ruff check iptv_sniffer/cli/
 
 # Manual CLI test
 python -m iptv_sniffer.cli.app --help
@@ -306,7 +306,7 @@ python -m iptv_sniffer.cli.app scan --help
 uv run pytest tests/unit/cli/ -v
 
 # Type check
-mypy --strict iptv_sniffer/cli/
+uv run pyrefly check iptv_sniffer/cli/
 ```
 
 ### Entry Point Configuration

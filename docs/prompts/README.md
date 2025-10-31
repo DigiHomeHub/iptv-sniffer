@@ -8,7 +8,7 @@ Each prompt file guides the implementation of a specific task from the [Developm
 
 ## File Naming Convention
 
-```
+```text
 task-<phase>.<number>-<description-in-kebab-case>.md
 ```
 
@@ -64,9 +64,9 @@ uv run pytest tests/unit/<module>/test_<name>.py  # Should pass
 
 # Refactor: Improve code quality
 # Run quality gates
-mypy --strict iptv_sniffer/<module>/<file>.py
-ruff check iptv_sniffer/<module>/
-pytest --cov=iptv_sniffer/<module>/<file> --cov-report=term-missing
+uv run pyrefly iptv_sniffer/<module>/<file>.py
+uv run ruff check iptv_sniffer/<module>/
+uv run pytest --cov=iptv_sniffer/<module>/<file> --cov-report=term-missing
 ```
 
 ### Step 4: Verify Quality Gates
@@ -74,7 +74,7 @@ pytest --cov=iptv_sniffer/<module>/<file> --cov-report=term-missing
 All tasks must pass these quality gates before commit:
 
 - [ ] All tests pass: `pytest`
-- [ ] Type checking: `mypy --strict` reports no errors
+- [ ] Type checking: `pyrefly check` reports no errors
 - [ ] Linting: `ruff check` passes
 - [ ] Test coverage: ≥ target percentage (specified in prompt)
 - [ ] Module size: < 500 lines (excluding comments/blanks)
@@ -137,7 +137,7 @@ Closes #<issue-number>"
 
 All implementations must adhere to:
 
-- **Type Safety**: Full type hints with `mypy --strict`
+- **Type Safety**: Full type hints with `pyrefly`
 - **Code Style**: `ruff` configured with ANN401 rule (no `Any` in public APIs)
 - **Testing**: `pytest` + `pytest-asyncio` for async code
 - **Coverage**: Minimum 80% overall, 90% for critical paths
