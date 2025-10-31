@@ -305,13 +305,13 @@ class JSONChannelRepository:
 uv run pytest tests/unit/storage/test_json_repository.py -v
 
 # Type checking
-mypy --strict iptv_sniffer/storage/json_repository.py
+uv run pyrefly check iptv_sniffer/storage/json_repository.py
 
 # Linting
-ruff check iptv_sniffer/storage/
+uv run ruff check iptv_sniffer/storage/
 
 # Coverage
-pytest --cov=iptv_sniffer.storage.json_repository --cov-report=term-missing tests/unit/storage/
+uv run pytest --cov=iptv_sniffer.storage.json_repository --cov-report=term-missing tests/unit/storage/
 ```
 
 ---
