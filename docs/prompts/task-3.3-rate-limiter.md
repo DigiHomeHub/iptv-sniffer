@@ -4,11 +4,12 @@
 
 **Phase**: 3 - Network Scanning  
 **Duration**: 2 hours  
-**Complexity**: Low  
+**Complexity**: Low
 
 **Goal**: Implement concurrency control using asyncio.Semaphore to prevent network abuse.
 
 **Success Criteria**:
+
 - [ ] All tests pass
 - [ ] Type checking passes (mypy --strict)
 - [ ] Test coverage ≥ 85%
@@ -18,6 +19,7 @@
 ## Design Context
 
 **Concurrency Control** (Design.md Section 4, lines 369-426):
+
 - Default: 10 concurrent requests
 - Maximum: 50 concurrent requests
 - Timeout: 10 seconds default
