@@ -95,9 +95,9 @@ class StreamValidatorTestCase(unittest.IsolatedAsyncioTestCase):
             await self.validator.validate("rtp://239.0.0.1:1234", timeout=5)
 
         kwargs = mock_probe.call_args.kwargs
-        timeout_value = kwargs.get("timeout")
-        assert timeout_value is not None
-        self.assertGreaterEqual(timeout_value, 20)
+        timeout = kwargs.get("timeout")
+        assert isinstance(timeout, int)
+        self.assertGreaterEqual(timeout, 20)
 
     async def test_validate_unsupported_protocol(self) -> None:
         result = await self.validator.validate("ftp://example.com/stream", timeout=5)
