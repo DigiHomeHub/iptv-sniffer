@@ -15,7 +15,7 @@ When generating or modifying code, agents should aim to:
 - Write idiomatic Python code with type hints and Pydantic models (never use `dataclass` for data validation)
 - Use `ffmpeg-python` library instead of subprocess command-line strings for FFmpeg operations
 - Implement asynchronous network scanning with proper rate limiting to avoid network abuse
-- Follow TDD: write pytest-based tests before implementing features
+- Follow TDD: write unittest-based tests before implementing features
 - Build modular, testable components: network scanning, stream validation, M3U parsing, web API
 - Provide clear logging with structured context (channel URL, scan duration, validation status)
 - Respect Docker best practices: multi-stage builds, small images, health checks
@@ -75,9 +75,9 @@ iptv-sniffer/
 ## Tools & Conventions
 
 - **Project management**: `uv` (recommended) or `poetry` for dependency management and lockfiles
-- **Type checking**: `mypy` with strict mode; ensure ffmpeg-python stubs are installed
+- **Type checking**: `pyrefly` with strict mode; ensure ffmpeg-python stubs are installed
 - **Linting**: `ruff` configured to enforce no `Any` in public signatures (ANN401)
-- **Testing**: `pytest` + `pytest-asyncio` (if using async); each feature must include unit tests
+- **Testing**: `unittest` (Python built-in) + `unittest.IsolatedAsyncioTestCase` for async tests; each feature must include unit tests
 - **Network scanning**: Use `asyncio` + `aiohttp` for concurrent HTTP requests; limit concurrency to avoid network abuse
 - **FFmpeg integration**: Use `ffmpeg-python` library, never subprocess with command strings
   - Example: `ffmpeg.input(url, **options).output('pipe:', format='null').run(capture_stderr=True)`
@@ -311,12 +311,12 @@ chore(docker): optimize multi-stage build for smaller image size
 
 5. **For each new feature/enhancement**:
 
-   - Write unit tests first using pytest framework (TDD approach)
+   - Write unit tests first using unittest framework (TDD approach)
    - Implement minimal code to pass tests
    - Enforce type safety: Pydantic models (never `dataclass`), avoid `Any` in public APIs
    - Use `ffmpeg-python` library (never subprocess command strings)
    - Keep each source file under 500 lines (excluding comments/blanks)
-   - Run `pytest` and `mypy` to verify no errors
+   - Run `uv run pytest` and `uv run pyrefly` to verify no errors
    - If file approaches 450 lines, refactor into submodules
 
 6. **Test network scanning features**:
@@ -350,9 +350,9 @@ Before merging changes to iptv-sniffer, ensure:
 
 **Testing & Type Safety**:
 
-- All tests pass: `pytest`
-- Type checking passes: `mypy --strict`
-- Linter reports no infractions: `ruff check`
+- All tests pass: `uv run pytest`
+- Type checking passes: `uv run pyrefly check`
+- Linter reports no infractions: `uv run ruff check`
 - Public APIs have type hints, no `Any` in signatures
 
 **Code Quality**:
