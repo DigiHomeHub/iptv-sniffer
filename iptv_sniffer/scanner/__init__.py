@@ -1,11 +1,14 @@
-"""Scanner package initialization."""
+"""Scanner package exports."""
 
 from .screenshot import capture_screenshot
+from .strategy import ScanMode, ScanStrategy
 from .validator import ErrorCategory, StreamValidationResult, StreamValidator
 
 __all__ = [
-    "StreamValidator",
-    "StreamValidationResult",
-    "ErrorCategory",
     "capture_screenshot",
+    "ScanMode",
+    "ScanStrategy",
+    "ErrorCategory",
+    "StreamValidationResult",
+    "StreamValidator",
 ]
