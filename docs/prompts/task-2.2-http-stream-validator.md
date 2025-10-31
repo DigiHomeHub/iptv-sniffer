@@ -340,13 +340,13 @@ class StreamValidator:
 uv run pytest tests/unit/scanner/test_validator.py -v
 
 # Type checking
-mypy --strict iptv_sniffer/scanner/validator.py
+uv run pyrefly iptv_sniffer/scanner/validator.py
 
 # Linting
-ruff check iptv_sniffer/scanner/
+uv run ruff check iptv_sniffer/scanner/
 
 # Coverage
-pytest --cov=iptv_sniffer.scanner.validator --cov-report=term-missing tests/unit/scanner/test_validator.py
+uv run pytest --cov=iptv_sniffer.scanner.validator --cov-report=term-missing tests/unit/scanner/test_validator.py
 ```
 
 ---
@@ -375,7 +375,7 @@ asyncio.run(test())
 uv run pytest tests/unit/scanner/ -v
 
 # Type check
-mypy --strict iptv_sniffer/scanner/
+uv run pyrefly check iptv_sniffer/scanner/
 ```
 
 ### Commit Message Template
