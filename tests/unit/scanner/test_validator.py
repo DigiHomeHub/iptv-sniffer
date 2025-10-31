@@ -44,7 +44,7 @@ class StreamValidatorTestCase(unittest.IsolatedAsyncioTestCase):
             "iptv_sniffer.scanner.validator.check_ffmpeg_installed", return_value=True
         )
         self.addCleanup(patcher.stop)
-        self.mock_ffmpeg_check = patcher.start()
+        patcher.start()
         self.validator = StreamValidator(max_workers=2)
 
     async def test_validate_http_stream_success(self) -> None:
@@ -96,8 +96,7 @@ class StreamValidatorTestCase(unittest.IsolatedAsyncioTestCase):
 
         kwargs = mock_probe.call_args.kwargs
         timeout_value = kwargs.get("timeout")
-        self.assertIsNotNone(timeout_value)
-        assert timeout_value is not None  # Type narrowing for pyrefly
+        assert timeout_value is not None
         self.assertGreaterEqual(timeout_value, 20)
 
     async def test_validate_unsupported_protocol(self) -> None:
