@@ -282,13 +282,13 @@ pytest --cov=iptv_sniffer.channel.models --cov-report=term-missing tests/unit/ch
 uv run pytest tests/unit/channel/ -v --tb=short
 
 # Type check with strict mode
-mypy --strict iptv_sniffer/channel/
+uv run pyrefly check iptv_sniffer/channel/
 
 # Check code style
-ruff check iptv_sniffer/channel/
+uv run ruff check iptv_sniffer/channel/
 
 # Verify coverage threshold
-pytest --cov=iptv_sniffer.channel --cov-report=term-missing \
+uv run pytest --cov=iptv_sniffer.channel --cov-report=term-missing \
        --cov-fail-under=90 tests/unit/channel/
 ```
 
