@@ -276,13 +276,13 @@ def get_install_instructions() -> str:
 uv run pytest tests/unit/utils/test_ffmpeg.py -v
 
 # Type checking
-mypy --strict iptv_sniffer/utils/ffmpeg.py
+uv run pyrefly check iptv_sniffer/utils/ffmpeg.py
 
 # Linting
-ruff check iptv_sniffer/utils/
+uv run ruff check iptv_sniffer/utils/
 
 # Coverage
-pytest --cov=iptv_sniffer.utils.ffmpeg --cov-report=term-missing tests/unit/utils/test_ffmpeg.py
+uv run pytest --cov=iptv_sniffer.utils.ffmpeg --cov-report=term-missing tests/unit/utils/test_ffmpeg.py
 ```
 
 ---
