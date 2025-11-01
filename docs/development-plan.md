@@ -2456,16 +2456,477 @@ app.include_router(scan.router)
 
 ---
 
-(Continue with remaining tasks following same TDD pattern...)
+## Phase 7: Web Interface & Product Integration (Weeks 13-17)
+
+**Goal:** Build complete web frontend to enable end-user product usage, completing the journey from backend infrastructure to usable product.
+
+**Context:** Phase 1-6 delivered robust backend capabilities (scanning, validation, M3U support, REST API foundation), but the product lacks any user interface. This phase bridges the gap by implementing:
+
+- Web UI for all core workflows (scan, manage, export)
+- Frontend-backend integration with Vue 3 + Vite
+- Real-time progress updates
+- Channel grouping system
+- Production-ready polish
+
+**Frontend Technology Stack:**
+
+- **Framework:** Vue 3.4+ (Composition API with `<script setup>`)
+- **Build Tool:** Vite 5+
+- **Language:** TypeScript 5+ (optional but recommended)
+- **UI Framework:** Tailwind CSS 3+ (via PostCSS)
+- **Component Library:** Headless UI (@headlessui/vue)
+- **HTTP Client:** Axios 1+
+- **State Management:** Pinia 2+ (when needed for cross-component state)
+
+**Priority Matrix:**
+
+- **P0 (Critical):** MVP usability - Frontend Setup + Stream Test page (Tasks 7.0-7.2)
+- **P1 (High):** Complete feature parity - Channel Management + M3U workflows (Tasks 7.3-7.4)
+- **P2 (Medium):** Advanced UX - Grouping + Real-time updates (Tasks 7.5-7.6)
+- **P3 (Low):** Optional enhancements - AI recognition + i18n (Tasks 7.7-7.8)
+
+---
+
+### Task 7.0: Vue 3 + Vite Frontend Setup (P0)
+
+**Priority:** P0 - Foundation for all frontend development
+
+**Test First (Red):**
+
+```python
+# tests/unit/web/test_frontend_build.py
+
+import subprocess
+from pathlib import Path
+
+def test_frontend_build_succeeds():
+    """Frontend build should complete without errors"""
+    frontend_dir = Path("frontend")
+    result = subprocess.run(
+        ["npm", "run", "build"],
+        cwd=frontend_dir,
+        capture_output=True,
+        text=True
+    )
+    assert result.returncode == 0
+    assert (frontend_dir / "dist" / "index.html").exists()
+
+def test_vite_config_proxy_configured():
+    """Vite should proxy API requests to FastAPI backend"""
+    vite_config = Path("frontend/vite.config.ts")
+    content = vite_config.read_text()
+    assert "proxy" in content
+    assert "/api" in content
+    assert "http://localhost:8000" in content
+```
+
+**Implement (Green):**
+
+#### Step 1: Initialize Vue 3 + Vite Project
+
+```bash
+# Create frontend directory
+cd /Users/bytedance/workspace/iptv-sniffer
+npm create vite@latest frontend -- --template vue-ts
+
+# Install dependencies
+cd frontend
+npm install
+
+# Install Tailwind CSS and Headless UI
+npm install -D tailwindcss postcss autoprefixer
+npm install @headlessui/vue
+npx tailwindcss init -p
+
+# Install Axios for HTTP client
+npm install axios
+```
+
+#### Step 2: Configure Vite Proxy
+
+```typescript
+// frontend/vite.config.ts
+
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import path from "path";
+
+export default defineConfig({
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+    },
+  },
+  build: {
+    outDir: "../iptv_sniffer/web/static",
+    emptyOutDir: true,
+  },
+});
+```
+
+#### Step 3: Configure Tailwind CSS
+
+```javascript
+// frontend/tailwindcss.config.js
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+```
+
+```css
+/* frontend/src/style.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500;
+  }
+}
+```
+
+#### Step 4: Create API Client
+
+```typescript
+// frontend/src/api/client.ts
+
+import axios, { AxiosInstance, AxiosResponse } from "axios";
+
+const apiClient: AxiosInstance = axios.create({
+  baseURL: "/api",
+  timeout: 30000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error) => {
+    const message =
+      error.response?.data?.detail || error.message || "Request failed";
+    console.error("API Error:", message);
+    return Promise.reject(new Error(message));
+  }
+);
+
+export default apiClient;
+```
+
+```typescript
+// frontend/src/api/scan.ts
+
+import apiClient from "./client";
+
+export interface ScanStartRequest {
+  mode: "template" | "multicast" | "m3u_batch";
+  base_url?: string;
+  start_ip?: string;
+  end_ip?: string;
+  protocol?: string;
+  ip_ranges?: string[];
+  ports?: number[];
+  timeout?: number;
+}
+
+export interface ScanStatusResponse {
+  scan_id: string;
+  status: "pending" | "running" | "completed" | "cancelled" | "failed";
+  progress: number;
+  total: number;
+  valid: number;
+  invalid: number;
+  started_at: string;
+  completed_at?: string;
+}
+
+export const scanAPI = {
+  start: (data: ScanStartRequest) =>
+    apiClient.post<{ scan_id: string }>("/scan/start", data),
+
+  getStatus: (scanId: string) =>
+    apiClient.get<ScanStatusResponse>(`/scan/${scanId}`),
+
+  cancel: (scanId: string) => apiClient.delete(`/scan/${scanId}`),
+};
+```
+
+#### Step 5: Update FastAPI to Serve Vue Build
+
+```python
+# iptv_sniffer/web/app.py (modify existing)
+
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
+
+app = FastAPI(
+    title="iptv-sniffer",
+    description="Discover and validate IPTV channels on local networks",
+    version=__version__
+)
+
+# Mount static files (Vue build output)
+static_dir = Path(__file__).parent / "static"
+if static_dir.exists():
+    app.mount("/assets", StaticFiles(directory=str(static_dir / "assets")), name="assets")
+
+# Serve index.html for all non-API routes (Vue Router history mode)
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """Serve Vue SPA for all non-API routes"""
+    if full_path.startswith("api/"):
+        # Let FastAPI handle API routes
+        return
+
+    index_path = static_dir / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+
+    # Development mode: proxy to Vite dev server
+    return {"message": "Run 'npm run dev' in frontend/ directory"}
+```
+
+**Frontend Project Structure:**
+
+```text
+frontend/
+├── package.json           # NPM dependencies
+├── vite.config.ts         # Vite configuration with proxy
+├── tailwind.config.js     # Tailwind CSS configuration
+├── tsconfig.json          # TypeScript configuration
+├── index.html             # HTML entry point
+└── src/
+    ├── main.ts            # Vue app entry point
+    ├── App.vue            # Root component with router-view
+    ├── style.css          # Tailwind CSS imports
+    ├── api/               # API client layer
+    │   ├── client.ts      # Axios instance with interceptors
+    │   ├── scan.ts        # Scan API methods
+    │   └── channels.ts    # Channel API methods (Task 7.3)
+    ├── components/        # Reusable UI components
+    │   ├── BaseButton.vue
+    │   ├── BaseCard.vue
+    │   ├── BaseModal.vue
+    │   └── Toast.vue
+    ├── views/             # Page-level components
+    │   ├── StreamTest.vue # Stream Test page
+    │   ├── Channels.vue   # TV Channels page
+    │   ├── Groups.vue     # TV Groups page
+    │   └── Settings.vue   # Settings page
+    ├── router/            # Vue Router configuration
+    │   └── index.ts       # Route definitions
+    └── types/             # TypeScript type definitions
+        └── api.ts         # API response types
+```
+
+**Definition of Done:**
+
+- [ ] Vite project initialized with Vue 3 + TypeScript
+- [ ] Tailwind CSS configured and working
+- [ ] Vite proxy correctly forwards /api requests to FastAPI
+- [ ] Frontend build outputs to iptv_sniffer/web/static/
+- [ ] FastAPI serves Vue SPA for non-API routes
+- [ ] API client with error handling implemented
+- [ ] Development server runs on <http://localhost:5173>
+- [ ] Production build verified
+
+---
+
+### Task 7.1: Vue Router + Tab Navigation (P0)
+
+**Priority:** P0 - Core navigation structure
+
+**Description:** Implement Vue Router with tab-based navigation for 4 main application pages.
+
+**Key Deliverables:**
+
+- Vue Router configuration with history mode
+- App.vue root component with tab navigation using Headless UI
+- Route guards for future authentication
+- Placeholder view components for all pages
+
+**Implementation Details:** See `docs/prompts/task-7.1-vue-router-tab-navigation.md`
+
+**Definition of Done:**
+
+- [ ] Vue Router 4 configured with 4 routes
+- [ ] Tab navigation working with active state indication
+- [ ] Keyboard navigation accessible (Tab/Enter/Arrow keys)
+- [ ] Responsive layout on mobile/tablet/desktop
+- [ ] All route transition tests pass
+- [ ] No console errors or warnings
+
+---
+
+### Task 7.2: Stream Test Page with Vue (P0)
+
+**Priority:** P0 - Core user workflow (scan discovery)
+
+**Description:** Implement Stream Test page using Vue 3 Composition API with scan configuration form, real-time progress tracking via HTTP polling, and results display with filtering.
+
+**Key Components:**
+
+- `StreamTest.vue` - Main page component with reactive scan state
+- `ScanConfigForm.vue` - Input form for base URL and IP range
+- `ScanProgress.vue` - Real-time progress bar with statistics
+- `ChannelResultsGrid.vue` - Filterable channel results with screenshots
+- `Toast.vue` - Toast notification component for user feedback
+
+**Implementation Details:** See `docs/prompts/task-7.2-vue-stream-test-page.md`
+
+**Definition of Done:**
+
+- [ ] Form validates input (URL pattern, IP format) with Vuelidate
+- [ ] Scan starts and returns scan_id
+- [ ] Progress bar updates every second via HTTP polling
+- [ ] Results display with screenshot thumbnails
+- [ ] Filter buttons work correctly (All/Success/Failed/4K/1080p/720p)
+- [ ] Cancel button stops scan
+- [ ] Mobile responsive layout
+- [ ] Unit tests for all components >80% coverage
+- [ ] E2E test for scan workflow with Playwright
+
+---
+
+### Task 7.3: Screenshot Display with Vue (P0)
+
+**Priority:** P0 - Critical for visual validation
+
+**Description:** Implement screenshot display components using Vue 3 with lazy loading, lightbox modal, and secure FastAPI endpoint for serving screenshot images.
+
+**Key Components:**
+
+- `ChannelCard.vue` - Channel card with screenshot thumbnail
+- `ImageLightbox.vue` - Full-screen image viewer with Headless UI Dialog
+- Screenshot API endpoint (`/api/screenshots/{filename}`) with path traversal protection
+
+**Implementation Details:** See `docs/prompts/task-7.3-vue-screenshot-display.md`
+
+**Definition of Done:**
+
+- [ ] Screenshot endpoint serves images correctly with security headers
+- [ ] Path traversal attack prevented
+- [ ] Lazy loading implemented with `<img loading="lazy">`
+- [ ] Lightbox modal with Headless UI Dialog for accessibility
+- [ ] Placeholder image for missing screenshots
+- [ ] Cache headers configured (`Cache-Control: public, max-age=3600`)
+- [ ] Unit tests for screenshot API >80% coverage
+- [ ] E2E test for lightbox interaction
+
+---
+
+### Task 7.4: Channel Management Page with Vue (P1)
+
+**Priority:** P1 - Required for channel browsing and CRUD operations
+
+**Description:** Implement TV Channels page with Vue 3, featuring filterable channel list, inline editing, batch operations, and pagination with FastAPI backend support.
+
+**Key Components:**
+
+- `TVChannels.vue` - Main channel management page
+- `ChannelTable.vue` - Data table with sorting and filtering
+- `ChannelEditModal.vue` - Modal for editing channel metadata
+- `BatchActionBar.vue` - Batch delete/validate/export actions
+- Channel API (`/api/channels`) - CRUD endpoints with pagination and filtering
+
+**Implementation Details:** See `docs/prompts/task-7.4-vue-channel-management.md`
+
+**Definition of Done:**
+
+- [ ] Channel list displays with pagination (default 50 per page)
+- [ ] Filters work: group, resolution, status (online/offline), search
+- [ ] Inline editing for channel name, logo, group, TVG metadata
+- [ ] Batch operations: delete, validate, export selected channels
+- [ ] Virtual scrolling for large channel lists (>1000 channels)
+- [ ] Backend API tests pass with >80% coverage
+- [ ] Frontend component tests pass with >75% coverage
+- [ ] OpenAPI documentation updated
+
+---
+
+### Task 7.5: M3U Import/Export with Vue (P1)
+
+**Priority:** P1 - Core workflow for existing playlists
+
+**Description:** Implement M3U file import/export functionality with Vue 3 drag-and-drop uploader, progress tracking, and character encoding detection. Backend API handles M3U parsing and generation.
+
+**Key Components:**
+
+- `M3UImport.vue` - File upload component with drag-and-drop support
+- `ImportProgress.vue` - Import progress tracker with validation status
+- `M3UExportModal.vue` - Export configuration modal with filter options
+- M3U API (`/api/m3u`) - Import/export endpoints with encoding detection
+
+**Implementation Details:** See `docs/prompts/task-7.5-vue-m3u-import-export.md`
+
+**Definition of Done:**
+
+- [ ] Drag-and-drop M3U file upload works
+- [ ] Character encoding detection accurate (UTF-8, GB2312, auto-detect)
+- [ ] Import progress displays: total channels, imported, failed with error reasons
+- [ ] Export modal with filters: group, resolution, status, custom selection
+- [ ] Generated M3U file is VLC playable
+- [ ] Large file support (>10,000 channels) with streaming
+- [ ] Backend API tests pass with >80% coverage
+- [ ] Frontend component tests pass with >75% coverage
+
+---
+
+(Continue with Tasks 7.6-7.9 following same pattern...)
 
 ## Summary
 
 This development plan provides a comprehensive TDD-driven roadmap covering:
 
 - **9 Phases** over 17 weeks
-- **60+ Test-First Tasks** with explicit Red-Green-Refactor cycles
+- **70+ Test-First Tasks** with explicit Red-Green-Refactor cycles
 - **Clear Definition of Done** for each task with measurable criteria
 - **Quality Gates:** pyrefly check, ruff check, >80% test coverage, <500 lines per module
+
+**Phase 7 adds:**
+
+- **9 additional tasks** for Web Interface with Vue 3 + Vite (Weeks 13-17)
+- **Modern frontend stack:** Vue 3 Composition API + TypeScript + Tailwind CSS + Headless UI
+- **Priority-driven approach:** P0 (MVP) → P1 (Core) → P2 (Advanced) → P3 (Optional)
+- **Frontend-backend integration** completing the product journey from CLI to full web application
+- **Production-ready polish** with Vite optimized builds and Docker deployment support
 
 Each task follows strict TDD discipline:
 

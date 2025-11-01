@@ -25,59 +25,117 @@ When generating or modifying code, agents should aim to:
 
 ```bash
 iptv-sniffer/
+  frontend/                    # Vue 3 + Vite frontend (separate workspace directory)
+    src/
+      components/              # Reusable Vue components
+        base/                  # Base UI components (Button, Input, Card)
+        streamTest/            # Stream Test page components
+        channels/              # Channel management components
+        m3u/                   # M3U import/export components
+      views/                   # Page-level components
+        StreamTest.vue         # Stream Test page
+        TVChannels.vue         # TV Channels page
+        TVGroups.vue           # TV Groups page
+        AdvancedSettings.vue   # Settings page
+      api/
+        client.ts              # Frontend API client (Axios wrapper)
+      router/
+        index.ts               # Vue Router configuration
+      types/
+        channel.ts             # TypeScript type definitions
+    public/                    # Static assets
+      favicon.ico
+      placeholder.png
+    tests/
+      unit/                    # Vitest component tests
+      e2e/                     # Playwright integration tests
+    package.json
+    vite.config.ts             # Vite build configuration
+    tsconfig.json
   iptv_sniffer/
     cli/
-        app.py           # CLI entry point (Click/Typer)
-        scan.py          # Network scanning commands
-        validate.py      # Stream validation commands
-        export.py        # M3U export commands
+        app.py                 # CLI entry point (Typer)
+        scan.py                # Network scanning commands
+        validate.py            # Stream validation commands
+        export.py              # M3U export commands
     web/
-        app.py           # Flask/FastAPI application
-        api/
-            channels.py  # Channel management endpoints
-            scan.py      # Scanning trigger endpoints
-            export.py    # M3U export endpoints
-        static/          # Static assets (HTML, CSS, JS)
-            index.html   # Main web interface
+        app.py                 # FastAPI application
+        api/                   # Backend REST API routers
+            channels.py        # Channel management endpoints
+            scan.py            # Scanning trigger endpoints
+            screenshots.py     # Screenshot serving endpoint
+            m3u.py             # M3U import/export endpoints
+        static/                # Built Vue frontend (Vite output)
+            index.html         # Generated from frontend build
+            assets/            # Generated JS/CSS bundles
     scanner/
-        discovery.py     # Network discovery (UDP multicast, HTTP probing)
-        validator.py     # Stream validation using ffmpeg-python
-        rate_limiter.py  # Rate limiting for network requests
+        strategy.py            # Abstract ScanStrategy base
+        template_strategy.py   # HTTP template-based scanning
+        multicast_strategy.py  # RTP/UDP multicast scanning
+        validator.py           # Stream validation using ffmpeg-python
+        screenshot.py          # Screenshot capture
+        rate_limiter.py        # Rate limiting for network requests
+        orchestrator.py        # Scan coordination and progress tracking
+        smart_port_scanner.py  # Two-phase port optimization
     m3u/
-        parser.py        # M3U/M3U8 parser
-        generator.py     # M3U/M3U8 generator
-        models.py        # M3U data models (Pydantic)
+        parser.py              # M3U/M3U8 parser
+        encoding.py            # Character encoding detection
+        generator.py           # M3U/M3U8 generator
+        models.py              # M3U data models (Pydantic)
     channel/
-        models.py        # Channel data models (Pydantic)
-        repository.py    # Channel CRUD operations
-        deduplicator.py  # Channel deduplication logic
+        models.py              # Channel data models (Pydantic)
     storage/
-        file_storage.py  # JSON/M3U file persistence
-        db_storage.py    # Optional: SQLite persistence
+        json_repository.py     # JSON-based channel repository
     utils/
-        log.py           # Logging helpers
-        config.py        # Configuration management
-        ffmpeg.py        # FFmpeg wrapper utilities
+        log.py                 # Logging helpers
+        config.py              # Configuration management (Pydantic Settings)
+        ffmpeg.py              # FFmpeg availability check
   tests/
-    unit/                # Unit tests (one test file per source file)
-    integration/         # Integration tests (Docker, FFmpeg, web API)
+    unit/                      # Python unit tests (unittest framework)
+      channel/
+      scanner/
+      m3u/
+      storage/
+      utils/
+      web/
+    integration/               # Integration tests (Docker, FFmpeg, web API)
     fixtures/
-        sample.m3u       # Sample M3U files for testing
-        invalid.m3u      # Invalid M3U for error testing
+        sample.m3u             # Sample M3U files for testing
+        invalid.m3u            # Invalid M3U for error testing
+  config/
+    multicast_presets.json     # Curated IPTV provider presets
   Dockerfile
   docker-compose.yml
-  requirements.txt
   pyproject.toml
+  uv.lock
   AGENTS.md
   README.md
 ```
+
+**Directory Structure Notes**:
+
+- **`frontend/`**: Separate Vue 3 + Vite workspace directory for frontend development
+  - Development server: `http://localhost:5173` with Vite HMR
+  - Production build outputs to `iptv_sniffer/web/static/` for Docker deployment
+- **`iptv_sniffer/web/api/`**: Backend FastAPI router modules (not frontend code)
+- **`frontend/src/api/`**: Frontend HTTP client wrapper (Axios-based)
+- **`tests/`**: Python backend tests only; frontend tests are in `frontend/tests/`
 
 ## Tools & Conventions
 
 - **Project management**: `uv` (recommended) or `poetry` for dependency management and lockfiles
 - **Type checking**: `pyrefly` with strict mode; ensure ffmpeg-python stubs are installed
 - **Linting**: `ruff` configured to enforce no `Any` in public signatures (ANN401)
-- **Testing**: `unittest` (Python built-in) + `unittest.IsolatedAsyncioTestCase` for async tests; each feature must include unit tests
+- **Backend Testing**: `unittest` (Python built-in) + `unittest.IsolatedAsyncioTestCase` for async tests; each feature must include unit tests
+  - Test location: `tests/unit/`, `tests/integration/`
+  - Coverage target: >80% for backend modules
+  - Run: `uv run python -m unittest discover -s tests/unit -v`
+- **Frontend Testing**: Vue 3 component and integration testing
+  - **Unit Tests**: Vitest + @vue/test-utils for component testing
+  - **E2E Tests**: Playwright for end-to-end workflows
+  - Test location: `frontend/tests/unit/`, `frontend/tests/e2e/`
+  - Coverage target: >75% for frontend components
+  - Run: `cd frontend && npm run test:unit` (Vitest) or `npm run test:e2e` (Playwright)
 - **Network scanning**: Use `asyncio` + `aiohttp` for concurrent HTTP requests; limit concurrency to avoid network abuse
 - **FFmpeg integration**: Use `ffmpeg-python` library, never subprocess with command strings
   - Example: `ffmpeg.input(url, **options).output('pipe:', format='null').run(capture_stderr=True)`
