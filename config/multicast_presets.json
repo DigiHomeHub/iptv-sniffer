@@ -1,0 +1,24 @@
+{
+  "presets": [
+    {
+      "id": "beijing-unicom",
+      "name": "北京联通 IPTV",
+      "description": "Beijing Unicom multicast IPTV channels.",
+      "protocol": "rtp",
+      "ip_ranges": ["239.3.1.1-239.3.1.255"],
+      "ports": [8000, 8004, 8008, 8012, 8016, 8020],
+      "estimated_targets": 1530,
+      "estimated_duration": "2-3 hours with smart scanning"
+    },
+    {
+      "id": "shanghai-telecom",
+      "name": "上海电信 IPTV",
+      "description": "Shanghai Telecom multicast IPTV channels.",
+      "protocol": "udp",
+      "ip_ranges": ["239.4.1.1-239.4.1.200"],
+      "ports": [9000, 9004, 9008, 9012],
+      "estimated_targets": 800,
+      "estimated_duration": "1-2 hours with smart scanning"
+    }
+  ]
+}
