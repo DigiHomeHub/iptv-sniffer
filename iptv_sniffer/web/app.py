@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from iptv_sniffer import __version__
 from iptv_sniffer.utils.ffmpeg import check_ffmpeg_installed
+from iptv_sniffer.web.api import scan_router
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(scan_router)
 
 
 @app.get("/health")

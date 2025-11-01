@@ -11,7 +11,7 @@
 **Success Criteria**:
 
 - [ ] All tests pass (TestClient with async)
-- [ ] Type checking passes (mypy --strict)
+- [ ] Type checking passes (uv run pyrefly check)
 - [ ] Test coverage ≥ 75%
 - [ ] Module size < 500 lines
 
