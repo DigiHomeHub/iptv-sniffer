@@ -5,6 +5,7 @@ description = "A lightweight tool to sniff available IPTV channels on your netwo
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "chardet>=5.2.0",
     "ffmpeg-python>=0.2.0",
     "pydantic>=2.12.3",
     "pydantic-settings>=2.6.1",
