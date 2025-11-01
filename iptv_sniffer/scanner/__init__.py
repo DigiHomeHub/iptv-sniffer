@@ -7,6 +7,7 @@ from .strategy import ScanMode, ScanStrategy
 from .template_strategy import TemplateScanStrategy
 from .multicast_strategy import MulticastScanStrategy
 from .smart_port_scanner import SmartPortScanner
+from .presets import PresetLoader, ScanPreset
 from .validator import ErrorCategory, StreamValidationResult, StreamValidator
 
 __all__ = [
@@ -19,6 +20,8 @@ __all__ = [
     "TemplateScanStrategy",
     "MulticastScanStrategy",
     "SmartPortScanner",
+    "ScanPreset",
+    "PresetLoader",
     "ErrorCategory",
     "StreamValidationResult",
     "StreamValidator",

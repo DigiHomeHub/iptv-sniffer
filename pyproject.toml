@@ -25,3 +25,9 @@ dev = [
 
 [project.scripts]
 iptv-sniffer = "iptv_sniffer.cli.app:app"
+
+[tool.setuptools]
+packages = ["iptv_sniffer"]
+
+[tool.setuptools.package-data]
+iptv_sniffer = ["py.typed"]
