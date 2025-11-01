@@ -11,7 +11,7 @@
 **Success Criteria**:
 
 - [ ] All tests pass
-- [ ] Type checking passes (mypy --strict)
+- [ ] Type checking passes (uv run pyrefly check)
 - [ ] Test coverage ≥ 85%
 
 ---
