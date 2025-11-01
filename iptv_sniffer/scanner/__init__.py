@@ -6,6 +6,7 @@ from .rate_limiter import RateLimiter
 from .strategy import ScanMode, ScanStrategy
 from .template_strategy import TemplateScanStrategy
 from .multicast_strategy import MulticastScanStrategy
+from .smart_port_scanner import SmartPortScanner
 from .validator import ErrorCategory, StreamValidationResult, StreamValidator
 
 __all__ = [
@@ -17,6 +18,7 @@ __all__ = [
     "RateLimiter",
     "TemplateScanStrategy",
     "MulticastScanStrategy",
+    "SmartPortScanner",
     "ErrorCategory",
     "StreamValidationResult",
     "StreamValidator",
