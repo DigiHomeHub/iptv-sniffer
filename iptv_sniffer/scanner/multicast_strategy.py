@@ -38,6 +38,16 @@ class MulticastScanStrategy(ScanStrategy):
             self._validate_port(port) for port in ports
         )
 
+    @property
+    def protocol(self) -> str:
+        """Return multicast protocol identifier (udp or rtp)."""
+        return self._protocol
+
+    @property
+    def ports(self) -> Tuple[int, ...]:
+        """Return tuple of configured ports."""
+        return self._ports
+
     async def generate_targets(self) -> AsyncIterator[str]:
         """Yield multicast targets for validation."""
         for start, end in self._ranges:
@@ -49,6 +59,11 @@ class MulticastScanStrategy(ScanStrategy):
         """Estimate total multicast targets to be generated."""
         ip_total = sum(self._count_ips(start, end) for start, end in self._ranges)
         return ip_total * len(self._ports)
+
+    def iter_ip_addresses(self) -> Iterable[ipaddress.IPv4Address]:
+        """Iterate over multicast IP addresses represented by configured ranges."""
+        for start, end in self._ranges:
+            yield from self._iterate_range(start, end)
 
     @staticmethod
     def _parse_range(
