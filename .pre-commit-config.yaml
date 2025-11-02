@@ -42,6 +42,7 @@ repos:
 
       # Check JSON file syntax
       - id: check-json
+        exclude: 'tsconfig.*\.json$'
 
       # Detect debug statements (pdb, ipdb, etc.)
       - id: debug-statements
