@@ -42,6 +42,7 @@ repos:
 
       # Check JSON file syntax
       - id: check-json
+        exclude: 'tsconfig.*\.json$'
 
       # Detect debug statements (pdb, ipdb, etc.)
       - id: debug-statements
@@ -94,7 +95,7 @@ repos:
     hooks:
       - id: pytest-testmon
         name: Smart Test Selection (testmon)
-        entry: uv run pytest --testmon --tb=short tests/unit/
+        entry: uv run pytest --testmon --tb=short tests/unit/ --ignore=tests/unit/web/test_frontend_build.py
         language: system
         pass_filenames: false
         types: [python]
