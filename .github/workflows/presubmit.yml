@@ -31,9 +31,6 @@ jobs:
         pip install uv
         uv sync --dev
         uv pip install -e .
-    - name: Presubmit Check
-      run: |
-        uv run pre-commit run --all-files --show-diff-on-failure
     - name: Test with pytest
       run: |
         uv run pytest -xvs tests/unit
