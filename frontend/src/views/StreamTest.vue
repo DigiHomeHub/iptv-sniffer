@@ -58,7 +58,7 @@ async function handleScanStart(payload: ScanStartRequest) {
     scanId.value = response.scan_id;
     scanProgress.value = {
       scan_id: response.scan_id,
-      status: response.status as ScanStatus,
+      status: (response.status as ScanStatus) ?? "pending",
       total: response.total ?? 0,
       completed: 0,
       valid: 0,
@@ -108,21 +108,34 @@ async function fetchStatusUpdate() {
 
   try {
     const status = await scanAPI.getStatus(scanId.value);
+    const completed =
+      typeof status.progress === "number"
+        ? status.progress
+        : typeof (status as any).completed === "number"
+          ? (status as any).completed
+          : 0;
+
     scanProgress.value = {
       scan_id: status.scan_id,
       status: status.status as ScanStatus,
-      total: status.total,
-      completed: status.progress,
-      valid: status.valid,
-      invalid: status.invalid,
+      total: status.total ?? 0,
+      completed,
+      valid: status.valid ?? 0,
+      invalid: status.invalid ?? 0,
     };
-    channels.value = Array.isArray(status.channels) ? status.channels : channels.value;
+
+    if (Array.isArray(status.channels)) {
+      channels.value = status.channels;
+    }
 
     if (status.status === "completed") {
       showToast("Scan completed", "success");
       stopPolling();
     } else if (status.status === "cancelled") {
       showToast("Scan cancelled", "info");
+      stopPolling();
+    } else if (status.status === "failed") {
+      showToast("Scan failed", "error");
       stopPolling();
     }
   } catch (error) {
