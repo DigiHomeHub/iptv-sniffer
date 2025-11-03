@@ -1,4 +1,5 @@
 import apiClient from "./client";
+import type { Channel } from "@/types/channel";
 
 export type ScanMode = "template" | "multicast" | "m3u_batch";
 
@@ -30,6 +31,7 @@ export interface ScanStatusResponse {
   started_at: string;
   completed_at?: string;
   error?: string;
+  channels?: Channel[];
 }
 
 export const scanAPI = {
@@ -50,3 +52,5 @@ export const scanAPI = {
     return response.data;
   },
 };
+
+export default { scanAPI };
