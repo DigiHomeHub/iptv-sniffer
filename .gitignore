@@ -212,3 +212,8 @@ __marimo__/
 
 # pytest-testmon
 .testmondata*
+
+# frontend
+frontend/node_modules/
+frontend/dist/
+iptv_sniffer/web/static/assets/

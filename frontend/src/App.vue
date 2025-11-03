@@ -1,3 +1,64 @@
+<script setup lang="ts">
+import { Tab, TabGroup, TabList } from "@headlessui/vue";
+import { computed } from "vue";
+import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
+
+interface TabItem {
+  label: string;
+  description: string;
+  route: string;
+}
+
+const tabs: TabItem[] = [
+  {
+    label: "Stream Test",
+    description: "Validate IPTV streams individually before adding them to playlists.",
+    route: "/stream-test",
+  },
+  {
+    label: "TV Channels",
+    description: "Manage discovered channels, validation status, and export options.",
+    route: "/channels",
+  },
+  {
+    label: "TV Groups",
+    description: "Organize channels into logical groups and presets.",
+    route: "/groups",
+  },
+  {
+    label: "Advanced Settings",
+    description: "Configure scan strategies, FFmpeg options, and persistence.",
+    route: "/settings",
+  },
+];
+
+const route = useRoute();
+const router = useRouter();
+
+const selectedIndex = computed(() => {
+  const index = tabs.findIndex((tab) => route.path.startsWith(tab.route));
+  return index >= 0 ? index : 0;
+});
+
+const currentDescription = computed(() => tabs[selectedIndex.value]?.description ?? "");
+
+function tabClasses(isActive: boolean) {
+  return [
+    "w-full rounded-lg px-4 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+    isActive
+      ? "bg-primary-600 text-white shadow focus-visible:ring-primary-500"
+      : "text-slate-600 hover:bg-slate-100 focus-visible:ring-primary-500",
+  ];
+}
+
+function onTabChange(index: number) {
+  const tab = tabs[index];
+  if (tab && route.path !== tab.route) {
+    router.push(tab.route);
+  }
+}
+</script>
+
 <template>
   <div class="min-h-screen bg-slate-100">
     <header class="border-b border-slate-200 bg-white">
@@ -29,38 +90,28 @@
       </div>
     </header>
 
-    <main class="mx-auto max-w-4xl px-6 py-10">
-      <section class="card space-y-4">
-        <h2 class="text-xl font-semibold text-slate-900">Frontend Setup</h2>
-        <p class="text-slate-600">
-          Vue 3 + Vite application scaffolded with Tailwind CSS and Headless UI.
-          This shell will host the network scan dashboard and channel management
-          workflows.
-        </p>
-        <div class="grid gap-4 md:grid-cols-2">
-          <div class="rounded-lg border border-slate-200 p-4">
-            <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Tech Stack
-            </h3>
-            <ul class="mt-2 space-y-1 text-sm text-slate-600">
-              <li>Vue 3 + TypeScript</li>
-              <li>Vite with Hot Module Replacement</li>
-              <li>Tailwind CSS utility styling</li>
-              <li>Headless UI components</li>
-            </ul>
-          </div>
-          <div class="rounded-lg border border-slate-200 p-4">
-            <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Next Steps
-            </h3>
-            <ul class="mt-2 space-y-1 text-sm text-slate-600">
-              <li>Integrate scan API for live progress</li>
-              <li>Implement preset selection UI</li>
-              <li>Visualize channel validation results</li>
-              <li>Provide download/export workflows</li>
-            </ul>
-          </div>
-        </div>
+    <main class="mx-auto max-w-5xl px-6 py-10">
+<TabGroup :selectedIndex="selectedIndex" @change="onTabChange">
+  <TabList class="flex flex-wrap gap-3 rounded-xl bg-white p-4 shadow-sm">
+    <Tab
+      v-for="tab in tabs"
+      :key="tab.route"
+      as="template"
+      v-slot="{ selected }"
+    >
+      <RouterLink :to="tab.route" :class="tabClasses(selected)">
+        {{ tab.label }}
+      </RouterLink>
+    </Tab>
+  </TabList>
+</TabGroup>
+
+      <p class="mt-4 text-sm text-slate-600">
+        {{ currentDescription }}
+      </p>
+
+      <section class="mt-6">
+        <RouterView />
       </section>
     </main>
   </div>
