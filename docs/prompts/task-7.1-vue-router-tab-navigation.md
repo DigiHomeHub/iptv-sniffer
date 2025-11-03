@@ -39,5 +39,3 @@ Implement Vue Router with tab-based navigation for 4 main pages: Stream Test, TV
 - Route navigation tests with Vue Test Utils
 - Tab switching UI tests
 - Accessibility tests for keyboard navigation
-
-For detailed implementation, see `docs/prompts/task-7.1-vue-router-tab-navigation.md`.
