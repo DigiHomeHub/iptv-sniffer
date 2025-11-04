@@ -2526,7 +2526,7 @@ def test_vite_config_proxy_configured():
 
 ```bash
 # Create frontend directory
-cd /Users/bytedance/workspace/iptv-sniffer
+cd ~/workspace/iptv-sniffer
 npm create vite@latest frontend -- --template vue-ts
 
 # Install dependencies
