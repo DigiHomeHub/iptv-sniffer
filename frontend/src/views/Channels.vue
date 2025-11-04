@@ -4,7 +4,10 @@ import { onMounted, ref } from "vue";
 import BatchActionBar from "@/components/channels/BatchActionBar.vue";
 import ChannelEditModal from "@/components/channels/ChannelEditModal.vue";
 import ChannelTable from "@/components/channels/ChannelTable.vue";
+import M3UExportModal from "@/components/m3u/M3UExportModal.vue";
+import M3UImport from "@/components/m3u/M3UImport.vue";
 import { channelsAPI, type ChannelListResponse } from "@/api/channels";
+import type { M3UImportResult } from "@/api/m3u";
 import type { Channel } from "@/types/channel";
 
 const channels = ref<Channel[]>([]);
@@ -15,6 +18,7 @@ const isLoading = ref(false);
 const selectedChannels = ref<Set<string>>(new Set());
 const showEditModal = ref(false);
 const editingChannel = ref<Channel | null>(null);
+const showExportModal = ref(false);
 
 const filters = ref({
   search: "",
@@ -109,6 +113,12 @@ function handleSelectionChange(selection: Set<string>) {
   selectedChannels.value = selection;
 }
 
+async function handleImportComplete(result: M3UImportResult) {
+  if (result.imported > 0) {
+    await fetchChannels();
+  }
+}
+
 onMounted(() => {
   fetchChannels();
 });
@@ -123,6 +133,27 @@ onMounted(() => {
         validations.
       </p>
     </header>
+
+    <section class="card space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">Import Playlist</h2>
+          <p class="text-sm text-slate-600">
+            Drag and drop an M3U/M3U8 file to merge channels into your library.
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" class="btn-secondary" @click="fetchChannels">
+            Refresh
+          </button>
+          <button type="button" class="btn-primary" @click="showExportModal = true">
+            Export M3U
+          </button>
+        </div>
+      </div>
+
+      <M3UImport @import-complete="handleImportComplete" />
+    </section>
 
     <section class="card space-y-3">
       <div class="grid gap-3 md:grid-cols-4">
@@ -201,5 +232,7 @@ onMounted(() => {
       @save="handleSaveChannel"
       @close="showEditModal = false"
     />
+
+    <M3UExportModal :is-open="showExportModal" @close="showExportModal = false" />
   </div>
 </template>
