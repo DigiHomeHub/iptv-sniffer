@@ -71,16 +71,8 @@ function onTabChange(index: number) {
         </div>
         <div class="space-x-3">
           <a
-            class="btn-secondary"
-            href="https://github.com/thsrite/iptv-sniff"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Reference Project
-          </a>
-          <a
             class="btn-primary"
-            href="https://github.com/bytedance/iptv-sniffer"
+            href="https://github.com/DigiHomeHub/iptv-sniffer"
             target="_blank"
             rel="noreferrer"
           >

@@ -99,7 +99,7 @@ uv run python -m unittest discover -s tests/unit/web -p 'test_frontend_build.py'
 #### Step 1: Initialize Vite + Vue Project
 
 ```bash
-cd /Users/bytedance/workspace/iptv-sniffer
+cd ~/workspace/iptv-sniffer
 
 # Create Vue 3 + TypeScript project with Vite
 npm create vite@latest frontend -- --template vue-ts
@@ -460,7 +460,7 @@ VITE_API_TIMEOUT=30000
 
    ```bash
    # Terminal 1: Start FastAPI backend
-   cd /Users/bytedance/workspace/iptv-sniffer
+   cd ~/workspace/iptv-sniffer
    uv run uvicorn iptv_sniffer.web.app:app --reload --port 8000
 
    # Terminal 2: Start Vite dev server

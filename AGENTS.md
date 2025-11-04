@@ -4,8 +4,6 @@ iptv-sniffer is a lightweight Python tool for discovering and validating IPTV ch
 
 **Repository Description**: A lightweight tool to sniff available IPTV channels on your network, with M3U import, export, and management support.
 
-**Reference Implementation**: Inspired by [thsrite/iptv-sniff](https://github.com/thsrite/iptv-sniff), but using `ffmpeg-python` library instead of command-line string concatenation for better type safety and maintainability.
-
 Agents and contributors should focus on network scanning ethics, FFmpeg integration best practices, M3U format compliance, and Docker deployment patterns.
 
 ## Goals for AI Agents
