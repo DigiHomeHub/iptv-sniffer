@@ -1,0 +1,55 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.testmondata
+.coverage
+coverage.xml
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Node artifacts
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+frontend/coverage/
+
+# Build outputs
+build/
+dist/
+
+# Editors and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git metadata
+.git/
+.gitignore
+
+# CI/CD configs
+.github/
+
+# Local environment files
+.env
+.env.*
+
+# Documentation and tests excluded from build context
+docs/
+tests/
+AGENTS.md
+README.md
+
+# Temporary files
+tmp/
+tmp_*/
+*.log

@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  iptv-sniffer:
+    image: iptv-sniffer:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: iptv-sniffer
+    ports:
+      - "8000:8000"
+    environment:
+      MAX_CONCURRENCY: 10
+      TIMEOUT: 10
+      LOG_LEVEL: INFO
+      DATA_DIR: /app/data
+      SCREENSHOT_DIR: /app/screenshots
+    volumes:
+      - ./data:/app/data
+      - ./screenshots:/app/screenshots
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
