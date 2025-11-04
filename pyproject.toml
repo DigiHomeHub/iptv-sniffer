@@ -8,6 +8,7 @@ dependencies = [
     "chardet>=5.2.0",
     "fastapi>=0.120.4",
     "ffmpeg-python>=0.2.0",
+    "python-multipart>=0.0.9",
     "httpx>=0.28.1",
     "pydantic>=2.12.3",
     "pydantic-settings>=2.6.1",

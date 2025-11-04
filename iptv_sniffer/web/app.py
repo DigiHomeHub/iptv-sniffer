@@ -11,7 +11,12 @@ from fastapi.staticfiles import StaticFiles
 
 from iptv_sniffer import __version__
 from iptv_sniffer.utils.ffmpeg import check_ffmpeg_installed
-from iptv_sniffer.web.api import channels_router, scan_router, screenshots_router
+from iptv_sniffer.web.api import (
+    channels_router,
+    m3u_router,
+    scan_router,
+    screenshots_router,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +59,7 @@ else:
 app.include_router(scan_router)
 app.include_router(screenshots_router)
 app.include_router(channels_router)
+app.include_router(m3u_router)
 
 
 @app.get("/health")
