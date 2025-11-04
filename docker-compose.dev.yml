@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: iptv-sniffer:dev
+    container_name: iptv-sniffer-backend
+    ports:
+      - "8000:8000"
+    environment:
+      LOG_LEVEL: DEBUG
+      MAX_CONCURRENCY: 10
+      TIMEOUT: 10
+      DATA_DIR: /app/data
+      SCREENSHOT_DIR: /app/screenshots
+    volumes:
+      - ./iptv_sniffer:/app/iptv_sniffer
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./screenshots:/app/screenshots
+    command: >
+      uvicorn iptv_sniffer.web.app:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    image: node:20-alpine
+    container_name: iptv-sniffer-frontend
+    working_dir: /app/frontend
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app/frontend
+    environment:
+      NODE_ENV: development
