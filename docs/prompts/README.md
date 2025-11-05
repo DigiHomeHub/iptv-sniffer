@@ -133,6 +133,20 @@ Closes #<issue-number>"
 - [Task 6.1](task-6.1-fastapi-setup.md): FastAPI Setup
 - [Task 6.2](task-6.2-scan-endpoints.md): Scan Endpoints
 
+### Phase 7: Web Interface (Weeks 13-17)
+
+- [Task 7.0](task-7.0-vue-vite-frontend-setup.md): Vue 3 + Vite Frontend Setup
+- [Task 7.1](task-7.1-vue-router-tab-navigation.md): Vue Router + Tab Navigation
+- [Task 7.2](task-7.2-vue-stream-test-page.md): Stream Test Page with Vue
+- [Task 7.3](task-7.3-vue-screenshot-display.md): Screenshot Display with Vue
+- [Task 7.4](task-7.4-vue-channel-management.md): Channel Management Page with Vue
+- [Task 7.5](task-7.5-vue-m3u-import-export.md): M3U Import/Export with Vue
+- [Task 7.6](task-7.6-vue-group-management.md): TV Groups Management with Vue
+
+### Phase 8: Docker & Deployment (Week 15)
+
+- [Task 8.1](task-8.1-docker-multi-stage-build.md): Docker Multi-Stage Build
+
 ## Quality Standards
 
 All implementations must adhere to:
