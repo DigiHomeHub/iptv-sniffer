@@ -13,6 +13,7 @@ from iptv_sniffer import __version__
 from iptv_sniffer.utils.ffmpeg import check_ffmpeg_installed
 from iptv_sniffer.web.api import (
     channels_router,
+    groups_router,
     m3u_router,
     scan_router,
     screenshots_router,
@@ -59,6 +60,7 @@ else:
 app.include_router(scan_router)
 app.include_router(screenshots_router)
 app.include_router(channels_router)
+app.include_router(groups_router)
 app.include_router(m3u_router)
 
 
