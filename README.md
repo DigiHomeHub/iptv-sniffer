@@ -507,37 +507,14 @@ docker build -t iptv-sniffer:latest .
 
 ### High-Level Overview
 
-```text
-┌─────────────────┐
-│   Vue 3 + Vite  │  Frontend (TypeScript + Tailwind CSS)
-│   Web Interface │  - Stream Test Page
-│                 │  - TV Channels Management
-│                 │  - M3U Import/Export
-└────────┬────────┘
-         │ HTTP/REST API
-         │
-┌────────▼────────┐
-│   FastAPI       │  Backend (Python 3.12+)
-│   Web Server    │  - Async endpoints
-│                 │  - OpenAPI docs (/docs)
-└────────┬────────┘
-         │
-    ┌────┴─────────────────────────┐
-    │                               │
-┌───▼──────────┐          ┌────────▼────────┐
-│  Scanner     │          │  M3U Parser     │
-│  Strategies  │          │  & Generator    │
-│  - Template  │          │  - UTF-8/GB*    │
-│  - Multicast │          │  - Extended     │
-│  - M3U Batch │          │    Attributes   │
-└───┬──────────┘          └─────────────────┘
-    │
-┌───▼──────────┐          ┌─────────────────┐
-│  Stream      │          │  JSON Storage   │
-│  Validator   │◄─────────┤  Repository     │
-│  (FFmpeg)    │          │  - Atomic write │
-│              │          │  - Deduplication│
-└──────────────┘          └─────────────────┘
+```mermaid
+graph TD
+    A[Vue 3 + Vite<br/>Web Interface<br/>(TypeScript + Tailwind CSS)] -->|HTTP/REST API| B[FastAPI<br/>Web Server<br/>(Python 3.12+)]
+    B --> C[Scanner Strategies<br/>- Template<br/>- Multicast<br/>- M3U Batch]
+    B --> D[M3U Parser &amp; Generator<br/>- UTF-8/GB*<br/>- Extended Attributes]
+    C --> E[Stream Validator<br/>(FFmpeg)]
+    E --> F[JSON Storage Repository<br/>- Atomic write<br/>- Deduplication]
+    D --> F
 ```
 
 ### Key Design Decisions
