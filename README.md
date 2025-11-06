@@ -509,10 +509,10 @@ docker build -t iptv-sniffer:latest .
 
 ```mermaid
 graph TD
-    A[Vue 3 + Vite<br/>Web Interface<br/>(TypeScript + Tailwind CSS)] -->|HTTP/REST API| B[FastAPI<br/>Web Server<br/>(Python 3.12+)]
+    A["Vue 3 + Vite<br/>Web Interface<br/>(TypeScript + Tailwind CSS)"] -->|HTTP/REST API| B["FastAPI<br/>Web Server<br/>(Python 3.12+)"]
     B --> C[Scanner Strategies<br/>- Template<br/>- Multicast<br/>- M3U Batch]
-    B --> D[M3U Parser &amp; Generator<br/>- UTF-8/GB*<br/>- Extended Attributes]
-    C --> E[Stream Validator<br/>(FFmpeg)]
+    B --> D[M3U Parser / Generator<br/>- UTF-8/GB*<br/>- Extended Attributes]
+    C --> E["Stream Validator<br/>(FFmpeg)"]
     E --> F[JSON Storage Repository<br/>- Atomic write<br/>- Deduplication]
     D --> F
 ```
